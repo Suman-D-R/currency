@@ -6,27 +6,27 @@ import downIcon from "./img/bx_bx-chevron-down.png";
 import arrow from "./img/Group.png";
 import Freecurrencyapi from "@everapi/freecurrencyapi-js";
 import { baseCurrency } from "./api";
+import CurrencyFlag from "react-currency-flags";
 
 function App() {
   const [initalCurrency, setInitalCurrency] = useState(0);
   const [convertedCurrency, setConvertedCurrency] = useState(0);
-  const [typeOne, setTypeOne] = useState();
-  const [typeTwo, setTypeTwo] = useState();
-  const [liveCurrency,setLiveCurrency] = useState();
+  const [typeOne, setTypeOne] = useState("USD");
+  const [typeTwo, setTypeTwo] = useState("USD");
+  const [liveCurrency, setLiveCurrency] = useState();
+  const [toggle, setToggle] = useState(true);
 
   const handleInitalCurrency = (e) => {
-    const amount = parseFloat(e.target.value) || 0; 
+    const amount = parseFloat(e.target.value) || 0;
     setInitalCurrency(amount);
-  
+
     if (liveCurrency && typeOne && typeTwo) {
       const baseRate = liveCurrency[typeOne];
       const targetRate = liveCurrency[typeTwo];
       const convertedAmount = (amount * targetRate) / baseRate;
-      setConvertedCurrency(isNaN(convertedAmount) ? 0 : convertedAmount); 
+      setConvertedCurrency(isNaN(convertedAmount) ? 0 : convertedAmount);
     }
   };
-  
-  
 
   const handleTypeOne = (e) => {
     setTypeOne(e.target.value);
@@ -37,7 +37,7 @@ function App() {
       setConvertedCurrency(isNaN(convertedAmount) ? 0 : convertedAmount);
     }
   };
-  
+
   const handleTypeTwo = (e) => {
     setTypeTwo(e.target.value);
     if (liveCurrency && typeOne && initalCurrency) {
@@ -47,25 +47,21 @@ function App() {
       setConvertedCurrency(isNaN(convertedAmount) ? 0 : convertedAmount);
     }
   };
-  
 
-  useEffect(()=>{
-    const fetchData = async ()=>{
-      const data = await baseCurrency()
-      setLiveCurrency(data.data.data)
-      console.log(data.data)
-    }
-    fetchData()
-  },[])
-   
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await baseCurrency();
+      setLiveCurrency(data.data.data);
+      console.log(data.data);
+    };
+    fetchData();
+  }, []);
 
+  const handleToggle = () => {
+    setToggle(!toggle);
+  };
 
-   
-
-  
-
-  const currency = ["USD", "INR", "GBP", "EUR"];
-  //USD, INR, GBP, EUR
+  const currency = ["USD", "INR", "GBP", "EUR", "NZD", "JPY", "CNY"];
   return (
     <div className="flex flex-col items-center  bg-gradient-to-b from-blue-50 to-white w-full h-screen">
       <div className="w-[80%] flex flex-col gap-1 mt-5">
@@ -83,13 +79,12 @@ function App() {
           </div>
           <div className="flex w-full  justify-between  items-center ">
             <div className="w-[45%] flex gap-4">
-              <img
-                className="border-2 shadow-xl h-[50px] rounded-[50%]"
-                src={img2}
-              />
+              <div className="border rounded-[50%] w-[50px] h-[50px] shadow-xl flex justify-center items-center">
+                <CurrencyFlag currency={typeOne} width={38} />
+              </div>
               <div className="flex items-center justify-center">
                 <select onChange={handleTypeOne}>
-                <option>select</option>
+                  <option>select</option>
                   {currency.map((val, index) => {
                     return (
                       <option key={index} value={val}>
@@ -122,10 +117,9 @@ function App() {
           </div>
           <div className="flex w-full  justify-between items-center ">
             <div className="w-[45%] flex gap-4">
-              <img
-                className="border-2 shadow-xl h-[50px] rounded-[50%]"
-                src={img1}
-              />
+            <div className="border rounded-[50%] w-[50px] h-[50px] shadow-xl flex justify-center items-center">
+                <CurrencyFlag currency={typeTwo} width={38} />
+              </div>
               <div className="flex items-center justify-center">
                 <select onChange={handleTypeTwo}>
                   <option>select</option>
@@ -147,8 +141,27 @@ function App() {
       </div>
       <div className="w-full flex flex-col mt-3 p-3 h-full">
         <p className="text-gray-400">Indecative Exchange Rate</p>
-        <p className="font-bold text-lg">{initalCurrency} {typeOne} = {convertedCurrency} {typeTwo}</p>
+        <p className="font-bold text-lg">
+          {initalCurrency} {typeOne} = {convertedCurrency} {typeTwo}
+        </p>
       </div>
+      {/* <div
+        onClick={handleToggle}
+        className={`w-[80%] mt-5 h-[200px] border-2 border-gray-700 flex justify-start`}
+      >
+        <div
+          className={`w-[100px] h-full`}
+          style={{
+            transition: "margin-left 0.5s ease-in-out",
+            marginLeft: toggle ? "calc(100% - 100px)" : "0px",
+          }}
+        >
+          <div
+            className={toggle ? "bg-red-500" : "bg-blue-500"}
+            style={{ height: "100%" }}
+          ></div>
+        </div>
+      </div> */}
     </div>
   );
 }
